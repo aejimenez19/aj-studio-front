@@ -20,6 +20,7 @@ export class UsersListComponent implements OnInit {
   loading = signal(true);
   error = signal<string | null>(null);
   showModal = signal(false);
+  editingUser = signal<User | null>(null);
   disablingUserIds = signal<Set<number>>(new Set());
 
   currentPage = signal(0);
@@ -60,15 +61,24 @@ export class UsersListComponent implements OnInit {
   }
 
   showCreateModal(): void {
+    this.editingUser.set(null);
     this.showModal.set(true);
   }
 
   closeModal(): void {
     this.showModal.set(false);
+    this.editingUser.set(null);
   }
 
   onUserCreated(): void {
     this.showModal.set(false);
+    this.editingUser.set(null);
+    this.loadUsers();
+  }
+
+  onUserUpdated(): void {
+    this.showModal.set(false);
+    this.editingUser.set(null);
     this.loadUsers();
   }
 
@@ -96,7 +106,8 @@ export class UsersListComponent implements OnInit {
   }
 
   editUser(user: User): void {
-    // TODO: implementar modal de edición
+    this.editingUser.set(user);
+    this.showModal.set(true);
   }
 
   goToPage(page: number): void {

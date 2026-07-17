@@ -117,7 +117,9 @@
 
 @if (showModal()) {
   <app-user-form-modal
+    [user]="editingUser()"
     (created)="onUserCreated()"
+    (updated)="onUserUpdated()"
     (closed)="closeModal()"
   />
 }

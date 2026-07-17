@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { User, CreateUserRequest, PageResponse } from '../models/user.types';
+import { User, CreateUserRequest, UpdateUserRequest, PageResponse } from '../models/user.types';
 import { environment } from '../../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
@@ -17,6 +17,10 @@ export class UserService {
 
   create(request: CreateUserRequest): Observable<User> {
     return this.http.post<User>(`${environment.apiUrl}/user/register`, request);
+  }
+
+  update(id: number, request: UpdateUserRequest): Observable<User> {
+    return this.http.put<User>(`${environment.apiUrl}/user/${id}`, request);
   }
 
   disable(id: number): Observable<void> {
