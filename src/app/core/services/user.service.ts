@@ -26,4 +26,8 @@ export class UserService {
   disable(id: number): Observable<void> {
     return this.http.patch<void>(`${environment.apiUrl}/user/${id}/disable`, {});
   }
+
+  enable(id: number): Observable<void> {
+    return this.http.patch<void>(`${environment.apiUrl}/user/${id}/enable`, {});
+  }
 }

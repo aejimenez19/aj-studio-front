@@ -22,6 +22,7 @@ export class UsersListComponent implements OnInit {
   showModal = signal(false);
   editingUser = signal<User | null>(null);
   disablingUserIds = signal<Set<number>>(new Set());
+  enablingUserIds = signal<Set<number>>(new Set());
 
   currentPage = signal(0);
   pageSize = signal(5);
@@ -101,6 +102,29 @@ export class UsersListComponent implements OnInit {
       error: (err: HttpErrorResponse) => {
         const apiError = err.error as ApiError;
         this.error.set(apiError?.message || 'Error al desactivar el usuario');
+      },
+    });
+  }
+
+  enableUser(user: User): void {
+    if (!window.confirm(`¿Activar al usuario "${user.fullName}"?`)) return;
+
+    this.enablingUserIds.update(s => new Set(s).add(user.id));
+    this.error.set(null);
+
+    this.userService.enable(user.id).pipe(
+      finalize(() => {
+        this.enablingUserIds.update(s => {
+          const next = new Set(s);
+          next.delete(user.id);
+          return next;
+        });
+      }),
+    ).subscribe({
+      next: () => this.loadUsers(),
+      error: (err: HttpErrorResponse) => {
+        const apiError = err.error as ApiError;
+        this.error.set(apiError?.message || 'Error al activar el usuario');
       },
     });
   }

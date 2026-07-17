@@ -58,6 +58,14 @@
                     >
                       {{ disablingUserIds().has(user.id) ? 'Desactivando...' : 'Desactivar' }}
                     </button>
+                  } @else {
+                    <button
+                      (click)="enableUser(user)"
+                      [disabled]="enablingUserIds().has(user.id)"
+                      class="text-green-600 transition hover:text-green-800 disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                      {{ enablingUserIds().has(user.id) ? 'Activando...' : 'Activar' }}
+                    </button>
                   }
                 </div>
               </td>
