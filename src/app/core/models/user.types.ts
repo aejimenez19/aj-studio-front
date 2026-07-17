@@ -24,6 +24,13 @@ export interface PageResponse<T> {
   empty: boolean;
 }
 
+export interface UpdateUserRequest {
+  fullName?: string;
+  email?: string;
+  password?: string;
+  role?: string;
+}
+
 export interface CreateUserRequest {
   fullName: string;
   email: string;

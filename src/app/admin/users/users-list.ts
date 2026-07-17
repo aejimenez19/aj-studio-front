@@ -1,5 +1,6 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, inject, signal, OnInit } from '@angular/core';
+import { finalize } from 'rxjs';
 import { UserService } from '../../core/services/user.service';
 import { User } from '../../core/models/user.types';
 import { ApiError } from '../../core/models/api-error.types';
@@ -19,6 +20,7 @@ export class UsersListComponent implements OnInit {
   loading = signal(true);
   error = signal<string | null>(null);
   showModal = signal(false);
+  disablingUserIds = signal<Set<number>>(new Set());
 
   currentPage = signal(0);
   pageSize = signal(5);
@@ -37,6 +39,11 @@ export class UsersListComponent implements OnInit {
 
     this.userService.getAll(this.currentPage(), this.pageSize()).subscribe({
       next: page => {
+        if (page.content.length === 0 && !page.first) {
+          this.currentPage.set(page.number - 1);
+          this.loadUsers();
+          return;
+        }
         this.users.set(page.content);
         this.totalPages.set(page.totalPages);
         this.totalElements.set(page.totalElements);
@@ -63,6 +70,33 @@ export class UsersListComponent implements OnInit {
   onUserCreated(): void {
     this.showModal.set(false);
     this.loadUsers();
+  }
+
+  disableUser(user: User): void {
+    if (!window.confirm(`¿Desactivar al usuario "${user.fullName}"?`)) return;
+
+    this.disablingUserIds.update(s => new Set(s).add(user.id));
+    this.error.set(null);
+
+    this.userService.disable(user.id).pipe(
+      finalize(() => {
+        this.disablingUserIds.update(s => {
+          const next = new Set(s);
+          next.delete(user.id);
+          return next;
+        });
+      }),
+    ).subscribe({
+      next: () => this.loadUsers(),
+      error: (err: HttpErrorResponse) => {
+        const apiError = err.error as ApiError;
+        this.error.set(apiError?.message || 'Error al desactivar el usuario');
+      },
+    });
+  }
+
+  editUser(user: User): void {
+    // TODO: implementar modal de edición
   }
 
   goToPage(page: number): void {

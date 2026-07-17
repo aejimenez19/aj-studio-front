@@ -18,4 +18,8 @@ export class UserService {
   create(request: CreateUserRequest): Observable<User> {
     return this.http.post<User>(`${environment.apiUrl}/user/register`, request);
   }
+
+  disable(id: number): Observable<void> {
+    return this.http.patch<void>(`${environment.apiUrl}/user/${id}/disable`, {});
+  }
 }
